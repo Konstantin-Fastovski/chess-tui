@@ -2,7 +2,7 @@
 
 int main() {
 
-    std::array<std::unique_ptr<Player>, 2> players = {
+    const std::array<std::unique_ptr<Player>, 2> players = {
         std::make_unique<LocalPlayer>(),
         std::make_unique<LocalPlayer>()
     };
@@ -10,14 +10,14 @@ int main() {
 
     Board board;
 
-    while (!board.hasPlayerWon()) {
+    while (true) {
         std::cout << "It's Player " << current_player+1 << "'s turn! " << std::endl;
-        auto move = players[current_player]->requestMove();
+        const auto move = players[current_player]->requestMove();
 
         // TODO: Validate move
-        // TODO: Update board
+        board.applyMove(move);
+        board.draw();
 
-        drawBoard(board);
         current_player = (current_player + 1) % 2;
     }
 

@@ -122,12 +122,25 @@ struct Move {
 struct Board {
     std::array<std::array<std::unique_ptr<Piece>, 8>, 8> grid;
 
-    void doMove(const Move move) {
+    // TODO: This method should return some kind of "MoveResult" which also states if a player won and so on
+    void applyMove(const Move move) {
       grid[move.to.x][move.to.y] = std::move(grid[move.from.x][move.from.y]);
     }
 
-    bool hasPlayerWon() {
-        return false;
+    void draw() const {
+        std::cout << "┏━━━━━━━━━━━━━━━━━┓" << std::endl;
+        for (const auto& row : this->grid) {
+            std::cout << "┃";
+            for (const auto& piece : row) {
+                if (piece) {
+                    std::cout << " " << piece->getUnicode();
+                } else {
+                    std::cout << "   ";
+                }
+            }
+            std::cout << " ┃" << std::endl;
+        }
+        std::cout << "┗━━━━━━━━━━━━━━━━━┛" << std::endl;
     }
 };
 
@@ -159,19 +172,3 @@ public:
         return convertMove(input);
     }
 };
-
-inline void drawBoard(const Board &board) {
-    std::cout << "┏━━━━━━━━━━━━━━━━━┓" << std::endl;
-    for (const auto& row : board.grid) {
-        std::cout << "┃";
-        for (const auto& piece : row) {
-            if (piece) {
-                std::cout << " " << piece->getUnicode();
-            } else {
-                std::cout << "   ";
-            }
-        }
-        std::cout << " ┃" << std::endl;
-    }
-    std::cout << "┗━━━━━━━━━━━━━━━━━┛" << std::endl;
-}
