@@ -14,6 +14,22 @@ struct Vector {
     Vector operator*(const int8_t& factor) const {
         return {static_cast<int8_t>(x * factor), static_cast<int8_t>(y * factor)};
     }
+
+    Vector operator+(const Vector& summand) const {
+        return {static_cast<int8_t>(x + summand.x), static_cast<int8_t>(y + summand.y)};
+    }
+
+    Vector mirrorHorizontal() const {
+        return Vector(static_cast<int8_t>(-x), y);
+    }
+
+    Vector mirrorVertical() const {
+        return Vector(x, static_cast<int8_t>(-y));
+    }
+
+    Vector rotate90(bool clockwise) const {
+        return Vector(clockwise ? y : static_cast<int8_t>(-y), clockwise ? static_cast<int8_t>(-x) : x);
+    }
 };
 
 typedef Vector BoardPos;
@@ -44,7 +60,7 @@ struct Piece {
     virtual std::vector<BoardPos> getReachableCells() = 0;
     virtual std::string getUnicode() = 0;
 
-    bool isWithinGrid(const Vector move) const {
+    bool isWithinGrid(const Vector& move) const {
         return (position.x + move.x) >= 0 && (position.x + move.x) < 8 && (position.y + move.y) >= 0 && (position.y + move.y) < 8;
     }
 
@@ -56,30 +72,31 @@ struct Pawn final : Piece {
         : Piece(pos, white) {
     }
 
+    const int8_t dir = white ? 1 : -1;
+    const uint8_t start_y = white ? 1 : 6;
+
     std::vector<BoardPos> getReachableCells() override {
         std::vector<BoardPos> reachable_cells;
-        const int8_t dir = white ? 1 : -1;
-        const uint8_t start_y = white ? 1 : 6;
-        if (position.y == start_y) {
-            reachable_cells.emplace_back(position.x, position.y + 2 * dir);
-        }
 
-        const auto move = Vector(position.x, position.y + 1 * dir);
-        if (isWithinGrid(move)) {
-            reachable_cells.push_back(move);
+        const Vector base_move = Vector(0, 1);
+
+        if (position.y == start_y) {
+            reachable_cells.emplace_back(position + base_move * 2 * dir); //why emplace_back?
         }
+        
+        reachable_cells.push_back(position + base_move * dir); //withinBoard checks unnecessary cuz pawns can't be on the last rank lol
         return reachable_cells;
     }
     std::vector<BoardPos> getCapturableCells() const {
         std::vector<BoardPos> capturable_cells;
         const int8_t dir = white ? 1 : -1;
-        auto move = Vector(position.x - 1, position.y + 1 * dir);
-        if (isWithinGrid(move)) {
-            capturable_cells.push_back(move);
+        auto destination = BoardPos(position.x - 1, position.y + 1 * dir);
+        if (isWithinGrid(destination)) {
+            capturable_cells.push_back(destination);
         }
-        move = Vector(position.x + 1, position.y + 1 * dir);
-        if (isWithinGrid(move)) {
-            capturable_cells.push_back(move);
+        destination = BoardPos(position.x + 1, position.y + 1 * dir);
+        if (isWithinGrid(destination)) {
+            capturable_cells.push_back(destination);
         }
         return capturable_cells;
     }
@@ -96,10 +113,12 @@ struct Rook final : Piece {
 
     std::vector<BoardPos> getReachableCells() override {
         std::vector<BoardPos> reachable_cells;
-        const std::vector<Vector> base_moves = {Vector(1, 0), Vector(0, -1), Vector(-1, 0), Vector(0, 1)};
-        for (Vector base_move : base_moves) {
-            for (int i = 1; isWithinGrid(base_move * i); i++) {
-                reachable_cells.push_back(base_move * i);
+        const Vector base_move = Vector(1, 0);
+        for (const Vector& rotated : {base_move, base_move.rotate90(true)}) {
+            for (int i = 1; ; i++) {
+                BoardPos destination = position + rotated * i;
+                if (!isWithinGrid(destination)) break;
+                reachable_cells.push_back(destination);
             }
         }
         return reachable_cells;
@@ -107,6 +126,54 @@ struct Rook final : Piece {
 
     std::string getUnicode() override {
         return "\u2656";
+    }
+};
+
+struct Knight final : Piece {
+    Knight(const BoardPos &pos, const bool white)
+        : Piece(pos, white) {
+    }
+
+    std::vector<BoardPos> getReachableCells() override {
+        std::vector<BoardPos> reachable_cells;
+        const Vector base_move = Vector(2, 1);
+        for (const Vector& mirrored : {base_move, base_move.mirrorHorizontal(), base_move.mirrorVertical(), base_move.mirrorHorizontal().mirrorVertical()}) {
+            for (const Vector& rotated : {mirrored, mirrored.rotate90(true)}) {
+                const BoardPos destination = position + mirrored;
+                if (isWithinGrid(destination)) {
+                    reachable_cells.push_back(destination);
+                }
+            }
+        }
+        return reachable_cells;
+    }
+
+    std::string getUnicode() override {
+        return "";
+    }
+};
+
+struct Bishop final : Piece {
+    Bishop(const BoardPos &pos, const bool white)
+        : Piece(pos, white) {
+    }
+
+    std::vector<BoardPos> getReachableCells() override {
+        std::vector<BoardPos> reachable_cells;
+
+        Vector base_move = Vector(1, 1);
+        for (const Vector& mirrored : {base_move, base_move.mirrorHorizontal(), base_move.mirrorVertical(), base_move.mirrorHorizontal().mirrorVertical()}) {
+            for (int i = 1; ; i++) {
+                BoardPos destination = position + mirrored * i;
+                if (!isWithinGrid(destination)) break;
+                reachable_cells.push_back(destination);
+            }
+        }
+        return reachable_cells;
+    }
+
+    std::string getUnicode() override {
+        return "";
     }
 };
 
