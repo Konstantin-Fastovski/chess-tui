@@ -30,6 +30,10 @@ struct Vector {
     Vector rotate90(bool clockwise) const {
         return Vector(clockwise ? y : static_cast<int8_t>(-y), clockwise ? static_cast<int8_t>(-x) : x);
     }
+
+    Vector* getAllPossibleTransforms() {
+        //TODO
+    }
 };
 
 typedef Vector BoardPos;
@@ -114,7 +118,7 @@ struct Rook final : Piece {
     std::vector<BoardPos> getReachableCells() override {
         std::vector<BoardPos> reachable_cells;
         const Vector base_move = Vector(1, 0);
-        for (const Vector& rotated : {base_move, base_move.rotate90(true)}) {
+        for (const Vector& rotated : {base_move, base_move.rotate90(true), base_move.mirrorHorizontal(), base_move.rotate90(false)}) {
             for (int i = 1; ; i++) {
                 BoardPos destination = position + rotated * i;
                 if (!isWithinGrid(destination)) break;
@@ -139,10 +143,40 @@ struct Knight final : Piece {
         const Vector base_move = Vector(2, 1);
         for (const Vector& mirrored : {base_move, base_move.mirrorHorizontal(), base_move.mirrorVertical(), base_move.mirrorHorizontal().mirrorVertical()}) {
             for (const Vector& rotated : {mirrored, mirrored.rotate90(true)}) {
-                const BoardPos destination = position + mirrored;
+                const BoardPos destination = position + rotated;
                 if (isWithinGrid(destination)) {
                     reachable_cells.push_back(destination);
                 }
+            }
+        }
+        return reachable_cells;
+    }
+
+    std::string getUnicode() override {
+        return "";
+    }
+};
+
+struct King final : Piece {
+    King(const BoardPos &pos, const bool white)
+        : Piece(pos, white) {
+    }
+
+    std::vector<BoardPos> getReachableCells() override {
+        std::vector<BoardPos> reachable_cells;
+        Vector base_move = Vector(1, 1);
+        for (const Vector& mirrored : {base_move, base_move.mirrorHorizontal(), base_move.mirrorVertical(), base_move.mirrorHorizontal().mirrorVertical()}) {
+            const BoardPos destination = position + mirrored;
+            if (isWithinGrid(destination)) {
+                reachable_cells.push_back(destination);
+            }
+        }
+        base_move = Vector(1, 0);
+        for (const Vector& rotated : {base_move, base_move.rotate90(true), base_move.mirrorHorizontal(), base_move.rotate90(false)}) {
+            for (int i = 1; ; i++) {
+                BoardPos destination = position + rotated * i;
+                if (!isWithinGrid(destination)) break;
+                reachable_cells.push_back(destination);
             }
         }
         return reachable_cells;
