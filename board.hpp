@@ -7,12 +7,12 @@
 #include <string>
 
 struct Vector {
-    uint8_t x, y;
+    int8_t x, y;
 
-    Vector(const uint8_t x, const uint8_t y) : x(x), y(y) {}
+    Vector(const int8_t x, const int8_t y) : x(x), y(y) {}
 
-    Vector operator*(const uint8_t& factor) const {
-        return {static_cast<uint8_t>(x * factor), static_cast<uint8_t>(y * factor)};
+    Vector operator*(const int8_t& factor) const {
+        return {static_cast<int8_t>(x * factor), static_cast<int8_t>(y * factor)};
     }
 };
 
