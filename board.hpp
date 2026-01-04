@@ -7,16 +7,31 @@
 #include <string>
 
 struct Vector {
-    int8_t x, y;
+    uint8_t x, y;
 
-    Vector(const int8_t x, const int8_t y) : x(x), y(y) {}
+    Vector(const uint8_t x, const uint8_t y) : x(x), y(y) {}
 
-    Vector operator*(const int& factor) const {
-        return Vector(x * factor, y * factor);
+    Vector operator*(const uint8_t& factor) const {
+        return {static_cast<uint8_t>(x * factor), static_cast<uint8_t>(y * factor)};
     }
 };
 
 typedef Vector BoardPos;
+
+inline BoardPos parseBoardPos(const std::string &input) {
+    if (input.size() != 2) {
+        throw std::invalid_argument("invalid square input");
+    }
+    const uint8_t file = input[0];
+    const uint8_t rank = input[1];
+    if (file < 97 || file > 104) {
+        throw std::invalid_argument("invalid file symbol");
+    }
+    if (rank < 48 || rank > 56) {
+        throw std::invalid_argument("invalid rank symbol");
+    }
+    return {static_cast<uint8_t>(rank-48), static_cast<uint8_t>(file-97)};
+}
 
 struct Piece {
     bool white;
@@ -46,7 +61,7 @@ struct Pawn final : Piece {
         const int8_t dir = white ? 1 : -1;
         const uint8_t start_y = white ? 1 : 6;
         if (position.y == start_y) {
-            reachable_cells.push_back(Vector(position.x, position.y + 2 * dir));
+            reachable_cells.emplace_back(position.x, position.y + 2 * dir);
         }
 
         const auto move = Vector(position.x, position.y + 1 * dir);
@@ -96,21 +111,16 @@ struct Rook final : Piece {
 };
 
 struct Move {
-    std::unique_ptr<Piece>& piece_ptr;
     BoardPos from;
     BoardPos to;
 
-    Move(std::unique_ptr<Piece>& piece_ptr, const BoardPos from, const BoardPos to)
-        : piece_ptr(piece_ptr), from(from), to(to) {
+    Move(const BoardPos from, const BoardPos to)
+        : from(from), to(to) {
     }
 };
 
 struct Board {
     std::array<std::array<std::unique_ptr<Piece>, 8>, 8> grid;
-
-    Board(){
-
-    }
 
     void doMove(const Move move) {
       grid[move.to.x][move.to.y] = std::move(grid[move.from.x][move.from.y]);
@@ -122,6 +132,25 @@ class Player {
     virtual Move requestMove() = 0;
 
     virtual ~Player() = default;
+};
+
+inline Move convertMove(const std::string& input) {
+    if (input.size() != 4) {
+        throw std::invalid_argument("invalid move input");
+    }
+    BoardPos fromPos = parseBoardPos(input.substr(0, 2));
+    BoardPos toPos = parseBoardPos(input.substr(2, 4));
+    return {fromPos, toPos};
+}
+
+class LocalPlayer final : public Player {
+public:
+    Move requestMove() override {
+        std::cout << "Please input move (Format a2b4):";
+        std::string input;
+        std::cin >> input;
+        return convertMove(input);
+    }
 };
 
 inline void drawBoard(const Board &board) {

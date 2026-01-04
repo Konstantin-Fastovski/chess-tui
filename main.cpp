@@ -2,21 +2,9 @@
 
 int main() {
 
-    Board board;
+    LocalPlayer localPlayer{};
 
-    for (int8_t i = 0; i < 8; ++i) {
-        for (int8_t j = 0; j < 8; ++j) {
-            BoardPos pos{i, j};
-            board.grid[i][j] = std::make_unique<Pawn>(pos, true);
-        }
-    }
-
-    for (const auto& row : board.grid) {
-        for (const auto& piece : row) {
-        }
-    }
-
-    drawBoard(board);
+    auto move = localPlayer.requestMove();
 
     return 0;
 }
