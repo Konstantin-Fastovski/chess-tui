@@ -24,10 +24,10 @@ inline BoardPos parseBoardPos(const std::string &input) {
     }
     const uint8_t file = input[0];
     const uint8_t rank = input[1];
-    if (file < 97 || file > 104) {
+    if (file < 97 || file > 104) { // Some Unicode magic numbers
         throw std::invalid_argument("invalid file symbol");
     }
-    if (rank < 48 || rank > 56) {
+    if (rank < 48 || rank > 56) { // Some Unicode magic numbers
         throw std::invalid_argument("invalid rank symbol");
     }
     return {static_cast<uint8_t>(rank-48), static_cast<uint8_t>(file-97)};
@@ -125,6 +125,10 @@ struct Board {
     void doMove(const Move move) {
       grid[move.to.x][move.to.y] = std::move(grid[move.from.x][move.from.y]);
     }
+
+    bool hasPlayerWon() {
+        return false;
+    }
 };
 
 class Player {
@@ -134,6 +138,9 @@ class Player {
     virtual ~Player() = default;
 };
 
+/**
+ * Currently only supports format (a2b3)
+ */
 inline Move convertMove(const std::string& input) {
     if (input.size() != 4) {
         throw std::invalid_argument("invalid move input");
@@ -146,7 +153,7 @@ inline Move convertMove(const std::string& input) {
 class LocalPlayer final : public Player {
 public:
     Move requestMove() override {
-        std::cout << "Please input move (Format a2b4):";
+        std::cout << "Please input move (Format a2b4): ";
         std::string input;
         std::cin >> input;
         return convertMove(input);
