@@ -4,11 +4,12 @@ project(chess_tui)
 set(CMAKE_CXX_STANDARD 23)
 
 add_executable(chess_tui
-        main.cpp
-        board.hpp
+        src/main.cpp
+        include/chess-tui/board.hpp
         include/chess-tui/vector.hpp
         src/vector.cpp
         include/chess-tui/piece.hpp
         src/piece.cpp
+        include/chess-tui/piece-visitor.hpp
 )
 target_include_directories(chess_tui PUBLIC include)

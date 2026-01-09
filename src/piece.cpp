@@ -9,7 +9,7 @@ std::vector<BoardPos> Pawn::getReachableCells(const BoardPos &position) {
 
     const Vector base_move = Vector(1, 0);
 
-    if (position.x == start_x) {
+    if (position.x == start_rank) {
         reachable_cells.emplace_back(position +
                                      base_move * 2 * dir); // why emplace_back?
     }
@@ -22,12 +22,11 @@ std::vector<BoardPos> Pawn::getReachableCells(const BoardPos &position) {
 
 std::vector<BoardPos> Pawn::getCapturableCells(const BoardPos &position) const {
     std::vector<BoardPos> capturable_cells;
-    const int8_t dir = white ? 1 : -1;
-    auto destination = BoardPos(position.x - 1, position.y + 1 * dir);
+    auto destination = BoardPos(position.x - 1, position.y + 1 * this->dir);
     if (destination.isWithinGrid()) {
         capturable_cells.push_back(destination);
     }
-    destination = BoardPos(position.x + 1, position.y + 1 * dir);
+    destination = BoardPos(position.x + 1, position.y + 1 * this->dir);
     if (destination.isWithinGrid()) {
         capturable_cells.push_back(destination);
     }
@@ -38,11 +37,15 @@ std::string Pawn::getUnicode() {
     return this->white ? "\u2659" : "\u265F";
 }
 
+void Pawn::visit(PieceVisitor &pieceVisitor) {
+    pieceVisitor.visit(*this);
+}
+
 std::vector<BoardPos> Rook::getReachableCells(const BoardPos &position) {
     std::vector<BoardPos> reachable_cells;
-    const Vector base_move = Vector(1, 0);
+    const auto base_move = Vector(1, 0);
     for (const Vector &move : base_move.getAllPossibleTransforms()) {
-        for (int i = 1;; i++) {
+        for (int8_t i = 1;; i++) {
             BoardPos destination = position + move * i;
             if (!destination.isWithinGrid())
                 break;
@@ -54,6 +57,10 @@ std::vector<BoardPos> Rook::getReachableCells(const BoardPos &position) {
 
 std::string Rook::getUnicode() {
     return this->white ? "\u2656" : "\u265C";
+}
+
+void Rook::visit(PieceVisitor &pieceVisitor) {
+    pieceVisitor.visit(*this);
 }
 
 std::vector<BoardPos> Knight::getReachableCells(const BoardPos &position) {
@@ -70,6 +77,10 @@ std::vector<BoardPos> Knight::getReachableCells(const BoardPos &position) {
 
 std::string Knight::getUnicode() {
     return this->white ? "\u2658" : "\u265E";
+}
+
+void Knight::visit(PieceVisitor &pieceVisitor) {
+    pieceVisitor.visit(*this);
 }
 
 std::vector<BoardPos> King::getReachableCells(const BoardPos &position) {
@@ -89,6 +100,10 @@ std::string King::getUnicode() {
     return this->white ? "\u2654" : "\u265A";
 }
 
+void King::visit(PieceVisitor &pieceVisitor) {
+    pieceVisitor.visit(*this);
+}
+
 std::vector<BoardPos> Bishop::getReachableCells(const BoardPos &position) {
     std::vector<BoardPos> reachable_cells;
 
@@ -106,6 +121,10 @@ std::vector<BoardPos> Bishop::getReachableCells(const BoardPos &position) {
 
 std::string Bishop::getUnicode() {
     return this->white ? "\u2657" : "\u265D";
+}
+
+void Bishop::visit(PieceVisitor &pieceVisitor) {
+    pieceVisitor.visit(*this);
 }
 
 std::vector<BoardPos> Queen::getReachableCells(const BoardPos &position) {
@@ -135,4 +154,8 @@ std::vector<BoardPos> Queen::getReachableCells(const BoardPos &position) {
 
 std::string Queen::getUnicode() {
     return this->white ? "\u2655" : "\u265B";
+}
+
+void Queen::visit(PieceVisitor &pieceVisitor) {
+    pieceVisitor.visit(*this);
 }
