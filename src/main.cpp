@@ -1,4 +1,6 @@
-#include "board.hpp"
+#include "chess-tui/board.hpp"
+#include "chess-tui/piece.hpp"
+#include "chess-tui/vector.hpp"
 
 int main() {
 
