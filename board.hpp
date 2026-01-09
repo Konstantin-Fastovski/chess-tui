@@ -346,13 +346,28 @@ public:
 /**
  * Currently only supports format (a2b3)
  */
+const char pieces[] = {'B', 'K', 'N', 'Q', 'R'}
+
 inline Move convertMove(const std::string &input) {
-  if (input.size() != 4) {
+  if (input.size() > 4 || input.size() < 2) {
     throw std::invalid_argument("invalid move input");
   }
-  BoardPos fromPos = parseBoardPos(input.substr(0, 2));
-  BoardPos toPos = parseBoardPos(input.substr(2, 4));
-  return {fromPos, toPos};
+
+  if (std::ranges::find(pieces, input[0]) != pieces.end()) {
+    // Moves with Piece: Format like Kf3, Rbb6, Q4c6
+    return {fromPos, toPos};
+  }
+
+  if (input.size() == 2) {
+    // Pawn moves
+    BoardPos toPos = parseBoardPos(input.substr(0, 2));
+    return {fromPos, toPos};
+  } else if (input.size() == 4) {
+    BoardPos fromPos = parseBoardPos(input.substr(0, 2));
+    BoardPos toPos = parseBoardPos(input.substr(2, 4));
+    return {fromPos, toPos};
+  }
+  throw std::invalid_argument("invalid move input");
 }
 
 class LocalPlayer final : public Player {
