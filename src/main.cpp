@@ -32,8 +32,8 @@ int main() {
       continue;
     }
 
-    const auto visitor = reachable_cells_visitor(board);
-    visitor.visit(*piece);
+    reachable_cells_visitor visitor = reachable_cells_visitor(board);
+    piece->visit(visitor);
 
     if (std::ranges::find(visitor.reachable_cells, move.to) == visitor.reachable_cells.end()) {
       std::cout << "This is not a valid move" << std::endl;

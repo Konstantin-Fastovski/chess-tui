@@ -21,41 +21,48 @@ public:
 
     void visit(Pawn &pawn) override
     {
-        const auto base_move = Vector(1, 0);
+        BoardPos pos = board.getPos(pawn);
+        const auto base_move = Vector(0, 1);
 
-        if (pawn.position.x == pawn.start_rank)
+        BoardPos destination = pos + base_move * pawn.dir;
+        if (board.getPiece(destination) == nullptr)
+            reachable_cells.push_back(
+                pos + base_move * pawn.dir);
+
+        destination = pos + base_move * pawn.dir * 2;
+        if (pos.x == pawn.start_rank && board.getPiece(destination) == nullptr)
         {
-            reachable_cells.emplace_back(pawn.position +
-                                         base_move * 2 * pawn.dir);
+            reachable_cells.push_back(destination);
         }
-
-        reachable_cells.push_back(
-            pawn.position + base_move * pawn.dir);
 
         const auto base_capture = Vector(1, 1);
         for (const Vector &capture : {base_capture * pawn.dir, base_capture.mirrorHorizontal() * pawn.dir})
         {
-            if (board.getPiece(pawn.position + capture) != nullptr && board.getPiece(pawn.position + capture)->white != pawn.white)
+            if (board.getPiece(pos + capture) != nullptr && board.getPiece(pos + capture)->white != pawn.white)
             {
-                reachable_cells.push_back(position + capture);
+                reachable_cells.push_back(pos + capture);
             }
         }
+        for (BoardPos i : reachable_cells)
+            printf("%i, %i  ", i.x, i.y);
+        std::cout << std::endl;
     }
 
     void visit(Rook &rook) override
     {
+        BoardPos pos = board.getPos(rook);
         const auto base_move = Vector(1, 0);
         for (const Vector &move : base_move.getAllPossibleTransforms())
         {
             for (int8_t i = 1;; i++)
             {
-                BoardPos destination = position + move * i;
+                BoardPos destination = pos + move * i;
 
-                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == rook->white)
+                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == rook.white)
                     break;
                 reachable_cells.push_back(destination);
 
-                if (board.getPiece(destination) != nullptr && board.getPiece(destination)->white != rook->white)
+                if (board.getPiece(destination) != nullptr && board.getPiece(destination)->white != rook.white)
                     break;
             }
         }
@@ -63,10 +70,11 @@ public:
 
     void visit(Knight &knight) override
     {
+        BoardPos pos = board.getPos(knight);
         const Vector base_move = Vector(2, 1);
         for (const Vector &move : base_move.getAllPossibleTransforms())
         {
-            const BoardPos destination = position + move;
+            const BoardPos destination = pos + move;
             if (destination.isWithinGrid())
             {
                 reachable_cells.push_back(destination);
@@ -78,11 +86,12 @@ public:
     // Alternatively leave it and implement the game logic, so that the game ends when the king is captured
     void visit(King &king) override
     {
+        BoardPos pos = board.getPos(king);
         for (int8_t x = -1; x < 1; ++x)
         {
             for (int8_t y = -1; y < 1; ++y)
             {
-                BoardPos destination = position + Vector(x, y);
+                BoardPos destination = pos + Vector(x, y);
                 if (x != 0 && y != 0 && destination.isWithinGrid())
                 {
                     reachable_cells.emplace_back(destination);
@@ -92,26 +101,18 @@ public:
 
         if (king.has_moved == false)
         {
-            auto &l_rook = board.getPiece(king.white ? BoardPos(0, 0) : BoardPos(0, 7));
-            if (l_rook != nullptr && l_rook->has_moved == false)
-            {
-                // TODO add castling
-            }
-            auto &r_rook = board.getPiece(king.white ? BoardPos(7, 0) : BoardPos(7, 7));
-            if (r_rook != nullptr && r_rook->has_moved == false)
-            {
-                // TODO add castling
-            }
+            // TODO add castling
         }
     }
     void visit(Bishop &bishop) override
     {
+        BoardPos pos = board.getPos(bishop);
         Vector base_move = Vector(1, 1);
         for (const Vector &move : base_move.getAllPossibleTransforms())
         {
             for (int i = 1;; i++)
             {
-                BoardPos destination = position + move * i;
+                BoardPos destination = pos + move * i;
 
                 if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == bishop.white)
                     break;
@@ -125,12 +126,13 @@ public:
 
     void visit(Queen &queen) override
     {
+        BoardPos pos = board.getPos(queen);
         const auto base_move_diagonal = Vector(1, 1);
         for (const Vector &move : base_move_diagonal.getAllPossibleTransforms())
         {
             for (int8_t i = 1;; i++)
             {
-                BoardPos destination = position + move * i;
+                BoardPos destination = pos + move * i;
 
                 if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == queen.white)
                     break;
@@ -145,7 +147,7 @@ public:
         {
             for (int8_t i = 1;; i++)
             {
-                BoardPos destination = position + move * i;
+                BoardPos destination = pos + move * i;
 
                 if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == queen.white)
                     break;

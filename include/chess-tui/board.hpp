@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <ranges>
 #include <cstdint>
 #include <iostream>
 #include <memory>
@@ -30,6 +31,8 @@ struct Board
   void draw() const;
 
   std::unique_ptr<Piece> &getPiece(const BoardPos &pos);
+
+  BoardPos getPos(Piece &piece);
 };
 
 class Player

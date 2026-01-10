@@ -83,6 +83,19 @@ std::unique_ptr<Piece> &Board::getPiece(const BoardPos &pos)
     return this->grid[pos.x][pos.y];
 }
 
+BoardPos Board::getPos(Piece &piece)
+{
+    for (int i = 0; i < this->grid.size(); i++)
+    {
+        for (int j = 0; j < this->grid[i].size(); j++)
+        {
+            if (&*this->grid[i][j] == &piece)
+                return BoardPos(i, j);
+        }
+    }
+    throw std::invalid_argument("piece not on board");
+}
+
 Move convertMove(const std::string &input)
 {
     if (input.size() > 4 || input.size() < 2)
@@ -102,7 +115,8 @@ Move convertMove(const std::string &input)
         BoardPos toPos = parseBoardPos(input.substr(0, 2));
         return {fromPos, toPos};
     }
-    else*/ if (input.size() == 4)
+    else*/
+    if (input.size() == 4)
     {
         BoardPos fromPos = parseBoardPos(input.substr(0, 2));
         BoardPos toPos = parseBoardPos(input.substr(2, 4));
