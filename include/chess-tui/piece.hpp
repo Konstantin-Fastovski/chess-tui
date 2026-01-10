@@ -58,6 +58,8 @@ struct Pawn final : Piece {
 struct Rook final : Piece {
   explicit Rook(const bool white) : Piece(white) {}
 
+  bool has_moved = false; // TODO Update this on the first move
+
   std::vector<BoardPos> getReachableCells(const BoardPos &position) override;
 
   std::string getUnicode() override;
@@ -77,6 +79,8 @@ struct Knight final : Piece {
 
 struct King final : Piece {
   explicit King(const bool white) : Piece(white) {}
+
+  bool has_moved = false; // TODO Update this on the first king move
 
   std::vector<BoardPos> getReachableCells(const BoardPos &position) override;
 
