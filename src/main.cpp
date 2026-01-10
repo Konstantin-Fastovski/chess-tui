@@ -1,6 +1,7 @@
 #include "chess-tui/board.hpp"
 #include "chess-tui/piece.hpp"
 #include "chess-tui/vector.hpp"
+#include "chess-tui/piece-visitor.hpp"
 
 int main() {
 
@@ -28,31 +29,18 @@ int main() {
     }
     if (piece->white != current_player) {
       std::cout << "This is not your piece" << std::endl;
+      continue;
     }
 
-    const std::vector<BoardPos> reachable_cells =
-        piece->getReachableCells(move.from);
+    const auto visitor = reachable_cells_visitor(board);
+    visitor.visit(*piece);
 
-    // TODO add logic for pawn captures
-    /*if (typeid(piece).name() == "Pawn") {
-      const std::vector<BoardPos> capturable_cells =
-          piece->getCapturableCells(move.from);
-      if (board.getPiece(move.to)) {
-        reachable_cells.insert(reachable_cells.end(), capturable_cells.begin(),
-                               capturable_cells.end());
-      }
-    }*/
-
-    if (std::ranges::find(reachable_cells, move.to) == reachable_cells.end()) {
+    if (std::ranges::find(visitor.reachable_cells, move.to) == visitor.reachable_cells.end()) {
       std::cout << "This is not a valid move" << std::endl;
       continue;
     }
     auto &capturePiece = board.getPiece(move.to);
     if (capturePiece) {
-      if (capturePiece->white == piece->white) {
-        std::cout << "You cannot capture your own piece" << std::endl;
-        continue;
-      }
       std::cout << "You captured a " << capturePiece->getUnicode() << std::endl;
     }
     capturePiece.reset();

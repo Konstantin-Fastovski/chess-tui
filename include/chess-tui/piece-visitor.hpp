@@ -25,22 +25,21 @@ public:
 
         if (pawn.position.x == pawn.start_rank)
         {
-            reachable_cells.emplace_back(position +
-                                         base_move * 2 * dir);
+            reachable_cells.emplace_back(pawn.position +
+                                         base_move * 2 * pawn.dir);
         }
 
         reachable_cells.push_back(
-            position + base_move * dir);
+            pawn.position + base_move * pawn.dir);
 
         const auto base_capture = Vector(1, 1);
-        for (const Vector &capture : {base_capture * dir, base_capture.mirrorHorizontal() * dir})
+        for (const Vector &capture : {base_capture * pawn.dir, base_capture.mirrorHorizontal() * pawn.dir})
         {
-            if (board.getPiece(position + capture) != nullptr && board.getPiece(position + capture).white != pawn.white)
+            if (board.getPiece(pawn.position + capture) != nullptr && board.getPiece(pawn.position + capture)->white != pawn.white)
             {
                 reachable_cells.push_back(position + capture);
             }
         }
-        return reachable_cells;
     }
 
     void visit(Rook &rook) override
@@ -52,15 +51,14 @@ public:
             {
                 BoardPos destination = position + move * i;
 
-                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination).white == rook.white)
+                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == rook->white)
                     break;
                 reachable_cells.push_back(destination);
 
-                if (board.getPiece(destination) != nullptr && board.getPiece(destination).white != rook.white)
+                if (board.getPiece(destination) != nullptr && board.getPiece(destination)->white != rook->white)
                     break;
             }
         }
-        return reachable_cells;
     }
 
     void visit(Knight &knight) override
@@ -74,7 +72,6 @@ public:
                 reachable_cells.push_back(destination);
             }
         }
-        return reachable_cells;
     }
 
     // TODO add isInCheck() method to disallow moves into check; could be computationally intensive.
@@ -95,18 +92,17 @@ public:
 
         if (king.has_moved == false)
         {
-            auto l_rook = board.getPiece(king.white ? BoardPos(0, 0) : BoardPos(0, 7));
-            if (l_rook != nullptr && l_rook.has_moved == false)
+            auto &l_rook = board.getPiece(king.white ? BoardPos(0, 0) : BoardPos(0, 7));
+            if (l_rook != nullptr && l_rook->has_moved == false)
             {
                 // TODO add castling
             }
-            auto r_rook = board.getPiece(king.white ? BoardPos(7, 0) : BoardPos(7, 7));
-            if (r_rook != nullptr && r_rook.has_moved == false)
+            auto &r_rook = board.getPiece(king.white ? BoardPos(7, 0) : BoardPos(7, 7));
+            if (r_rook != nullptr && r_rook->has_moved == false)
             {
                 // TODO add castling
             }
         }
-        return reachable_cells;
     }
     void visit(Bishop &bishop) override
     {
@@ -117,15 +113,14 @@ public:
             {
                 BoardPos destination = position + move * i;
 
-                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination).white == bishop.white)
+                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == bishop.white)
                     break;
                 reachable_cells.push_back(destination);
 
-                if (board.getPiece(destination) != nullptr && board.getPiece(destination).white != bishop.white)
+                if (board.getPiece(destination) != nullptr && board.getPiece(destination)->white != bishop.white)
                     break;
             }
         }
-        return reachable_cells;
     }
 
     void visit(Queen &queen) override
@@ -137,11 +132,11 @@ public:
             {
                 BoardPos destination = position + move * i;
 
-                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination).white == queen.white)
+                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == queen.white)
                     break;
                 reachable_cells.push_back(destination);
 
-                if (board.getPiece(destination) != nullptr && board.getPiece(destination).white != queen.white)
+                if (board.getPiece(destination) != nullptr && board.getPiece(destination)->white != queen.white)
                     break;
             }
         }
@@ -152,16 +147,14 @@ public:
             {
                 BoardPos destination = position + move * i;
 
-                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination).white == queen.white)
+                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == queen.white)
                     break;
                 reachable_cells.push_back(destination);
 
-                if (board.getPiece(destination) != nullptr && board.getPiece(destination).white != queen.white)
+                if (board.getPiece(destination) != nullptr && board.getPiece(destination)->white != queen.white)
                     break;
             }
         }
-
-        return reachable_cells;
     }
 
 private:
