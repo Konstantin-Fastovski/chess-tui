@@ -56,12 +56,7 @@ Vector Vector::rotate90(const bool clockwise) const {
 std::vector<Vector> Vector::getAllPossibleTransforms() const {
     // Treat Vector as a shape and return all possible Vectors with the same
     // shape.
-
-    if (x == 0) {
-        return {*this, this->mirrorVertical()};
-    } else if (y == 0) {
-        return {*this, this->mirrorHorizontal()};
-    } else if (x == y) {
+    if (x == y || y == 0 || x == 0) {
         return {*this, this->mirrorHorizontal(), this->mirrorVertical(),
                 this->mirrorVertical().mirrorHorizontal()};
     } else {
