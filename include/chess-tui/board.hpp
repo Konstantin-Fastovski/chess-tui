@@ -48,7 +48,8 @@ public:
  */
 const char pieces[] = {'B', 'K', 'N', 'Q', 'R'};
 
-inline Move convertMove(const std::string &input);
+Move convertMove(const std::string &input);
+
 
 class LocalPlayer final : public Player
 {

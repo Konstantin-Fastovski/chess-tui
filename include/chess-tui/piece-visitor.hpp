@@ -15,70 +15,50 @@ class reachable_cells_visitor final : public PieceVisitor
 public:
     std::vector<BoardPos> reachable_cells;
 
-    explicit reachable_cells_visitor(Board &board) : board(board)
+    explicit reachable_cells_visitor(Board &board, const BoardPos &pos) : board(board), pos(pos)
     {
+        const auto & piece = board.getPiece(pos);
+        if (!piece) return;
+        piece->visit(*this);
     }
 
     void visit(Pawn &pawn) override
     {
-        BoardPos pos = board.getPos(pawn);
         const auto base_move = Vector(0, 1);
 
-        BoardPos destination = pos + base_move * pawn.dir;
-        if (board.getPiece(destination) == nullptr)
-            reachable_cells.push_back(
-                pos + base_move * pawn.dir);
-
-        destination = pos + base_move * pawn.dir * 2;
-        if (pos.x == pawn.start_rank && board.getPiece(destination) == nullptr)
+        this->check_reachable(pawn, pos + base_move * pawn.dir, true, false);
+        if (pos.x == pawn.start_rank)
         {
-            reachable_cells.push_back(destination);
+            this->check_reachable(pawn, pos + base_move * pawn.dir * 2, true, false);
         }
 
         const auto base_capture = Vector(1, 1);
-        for (const Vector &capture : {base_capture * pawn.dir, base_capture.mirrorHorizontal() * pawn.dir})
-        {
-            if (board.getPiece(pos + capture) != nullptr && board.getPiece(pos + capture)->white != pawn.white)
-            {
-                reachable_cells.push_back(pos + capture);
-            }
-        }
-        for (BoardPos i : reachable_cells)
-            printf("%i, %i  ", i.x, i.y);
+        this->check_reachable(pawn, base_capture * pawn.dir, false, true);
+        this->check_reachable(pawn, base_capture.mirrorHorizontal() * pawn.dir, false, true);
+        for (const BoardPos &reachable_cell : reachable_cells)
+            printf("%i, %i  ", reachable_cell.x, reachable_cell.y);
         std::cout << std::endl;
     }
 
     void visit(Rook &rook) override
     {
-        BoardPos pos = board.getPos(rook);
         const auto base_move = Vector(1, 0);
         for (const Vector &move : base_move.getAllPossibleTransforms())
         {
-            for (int8_t i = 1;; i++)
-            {
-                BoardPos destination = pos + move * i;
-
-                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == rook.white)
-                    break;
-                reachable_cells.push_back(destination);
-
-                if (board.getPiece(destination) != nullptr && board.getPiece(destination)->white != rook.white)
-                    break;
+            for (Vector &dest = pos;
+                 this->check_reachable(rook, dest, true, true) == ReachableResult::MOVE;
+                 dest += move) {
             }
         }
     }
 
     void visit(Knight &knight) override
     {
-        BoardPos pos = board.getPos(knight);
         const Vector base_move = Vector(2, 1);
         for (const Vector &move : base_move.getAllPossibleTransforms())
         {
             const BoardPos destination = pos + move;
-            if (destination.isWithinGrid())
-            {
-                reachable_cells.push_back(destination);
-            }
+            this->check_reachable(knight, destination, true, true);
         }
     }
 
@@ -86,15 +66,13 @@ public:
     // Alternatively leave it and implement the game logic, so that the game ends when the king is captured
     void visit(King &king) override
     {
-        BoardPos pos = board.getPos(king);
         for (int8_t x = -1; x < 1; ++x)
         {
             for (int8_t y = -1; y < 1; ++y)
             {
                 BoardPos destination = pos + Vector(x, y);
-                if (x != 0 && y != 0 && destination.isWithinGrid())
-                {
-                    reachable_cells.emplace_back(destination);
+                if (x != 0 && y != 0) {
+                    this->check_reachable(king, destination, true, true);
                 }
             }
         }
@@ -106,61 +84,58 @@ public:
     }
     void visit(Bishop &bishop) override
     {
-        BoardPos pos = board.getPos(bishop);
         Vector base_move = Vector(1, 1);
         for (const Vector &move : base_move.getAllPossibleTransforms())
         {
-            for (int i = 1;; i++)
-            {
-                BoardPos destination = pos + move * i;
-
-                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == bishop.white)
-                    break;
-                reachable_cells.push_back(destination);
-
-                if (board.getPiece(destination) != nullptr && board.getPiece(destination)->white != bishop.white)
-                    break;
+            for (Vector &dest = pos;
+                 this->check_reachable(bishop, dest, true, true) == ReachableResult::MOVE;
+                 dest += move) {
             }
         }
     }
 
     void visit(Queen &queen) override
     {
-        BoardPos pos = board.getPos(queen);
         const auto base_move_diagonal = Vector(1, 1);
         for (const Vector &move : base_move_diagonal.getAllPossibleTransforms())
         {
-            for (int8_t i = 1;; i++)
-            {
-                BoardPos destination = pos + move * i;
-
-                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == queen.white)
-                    break;
-                reachable_cells.push_back(destination);
-
-                if (board.getPiece(destination) != nullptr && board.getPiece(destination)->white != queen.white)
-                    break;
+            for (Vector &dest = pos;
+                 this->check_reachable(queen, dest, true, true) == ReachableResult::MOVE;
+                 dest += move) {
             }
         }
         const auto base_move_straight = Vector(1, 0);
         for (const Vector &move : base_move_straight.getAllPossibleTransforms())
         {
-            for (int8_t i = 1;; i++)
-            {
-                BoardPos destination = pos + move * i;
-
-                if (!destination.isWithinGrid() || board.getPiece(destination) != nullptr && board.getPiece(destination)->white == queen.white)
-                    break;
-                reachable_cells.push_back(destination);
-
-                if (board.getPiece(destination) != nullptr && board.getPiece(destination)->white != queen.white)
-                    break;
+            for (Vector &dest = pos;
+                 this->check_reachable(queen, dest, true, true) == ReachableResult::MOVE;
+                 dest += move) {
             }
         }
     }
 
+    enum class ReachableResult {
+        UNREACHABLE = 0,
+        MOVE = 1,
+        CAPTURE = 2,
+    };
+    ReachableResult check_reachable(const Piece &piece, const BoardPos &dest, const bool can_walk, const bool can_capture) {
+        if (!dest.isWithinGrid()) return ReachableResult::UNREACHABLE;
+        const auto & target = board.getPiece(dest);
+        if (!target) {
+            if (!can_walk) return ReachableResult::UNREACHABLE;
+            reachable_cells.push_back(dest);
+            return ReachableResult::MOVE;
+        }
+        if (piece.white == target->white || !can_capture)
+            return ReachableResult::UNREACHABLE;
+        reachable_cells.push_back(dest);
+        return ReachableResult::CAPTURE;
+    }
+
 private:
     Board &board;
+    BoardPos pos;
 };
 
 #endif // CHESS_TUI_PIECE_VISITOR_HPP

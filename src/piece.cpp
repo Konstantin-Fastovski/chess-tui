@@ -7,7 +7,7 @@
 std::vector<BoardPos> Pawn::getReachableCells(const BoardPos &position) {
     std::vector<BoardPos> reachable_cells;
 
-    const Vector base_move = Vector(1, 0);
+    const auto base_move = Vector(1, 0);
 
     if (position.x == start_rank) {
         reachable_cells.emplace_back(position +

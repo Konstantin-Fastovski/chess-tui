@@ -32,7 +32,7 @@ int main() {
       continue;
     }
 
-    reachable_cells_visitor visitor = reachable_cells_visitor(board);
+    reachable_cells_visitor visitor = reachable_cells_visitor(board, move.from);
     piece->visit(visitor);
 
     if (std::ranges::find(visitor.reachable_cells, move.to) == visitor.reachable_cells.end()) {
