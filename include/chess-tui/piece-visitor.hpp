@@ -42,11 +42,9 @@ public:
         const auto base_move = Vector(1, 0);
         for (const Vector &move : base_move.getAllPossibleTransforms())
         {
-            //std::cout << std::to_string(move.x) << " " << std::to_string(move.y) << std::endl;
             for (Vector dest = pos + move;
                  this->check_reachable(rook, dest, true, true) == ReachableResult::MOVE;
                  dest += move) {
-                std::cout << std::to_string(dest.x)<< " " << std::to_string(dest.y) << std::endl;
             }
         }
     }
