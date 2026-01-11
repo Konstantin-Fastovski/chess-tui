@@ -26,8 +26,8 @@ Board::Board()
 {
     for (int x = 0; x < 8; ++x)
     {
-        this->grid[1][x] = std::make_unique<Pawn>(true);
-        this->grid[6][x] = std::make_unique<Pawn>(false);
+        //this->grid[1][x] = std::make_unique<Pawn>(true);
+        //this->grid[6][x] = std::make_unique<Pawn>(false);
     }
     this->grid[0][0] = std::make_unique<Rook>(true);
     this->grid[0][7] = std::make_unique<Rook>(true);

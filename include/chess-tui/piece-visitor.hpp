@@ -45,16 +45,18 @@ public:
         const auto base_move = Vector(1, 0);
         for (const Vector &move : base_move.getAllPossibleTransforms())
         {
-            for (Vector &dest = pos;
+            //std::cout << std::to_string(move.x) << " " << std::to_string(move.y) << std::endl;
+            for (Vector dest = pos + move;
                  this->check_reachable(rook, dest, true, true) == ReachableResult::MOVE;
                  dest += move) {
+                std::cout << std::to_string(dest.x)<< " " << std::to_string(dest.y) << std::endl;
             }
         }
     }
 
     void visit(Knight &knight) override
     {
-        const Vector base_move = Vector(2, 1);
+        const auto base_move = Vector(2, 1);
         for (const Vector &move : base_move.getAllPossibleTransforms())
         {
             const BoardPos destination = pos + move;
@@ -84,10 +86,10 @@ public:
     }
     void visit(Bishop &bishop) override
     {
-        Vector base_move = Vector(1, 1);
+        const auto base_move = Vector(1, 1);
         for (const Vector &move : base_move.getAllPossibleTransforms())
         {
-            for (Vector &dest = pos;
+            for (Vector dest = pos + move;
                  this->check_reachable(bishop, dest, true, true) == ReachableResult::MOVE;
                  dest += move) {
             }
@@ -99,7 +101,7 @@ public:
         const auto base_move_diagonal = Vector(1, 1);
         for (const Vector &move : base_move_diagonal.getAllPossibleTransforms())
         {
-            for (Vector &dest = pos;
+            for (Vector dest = pos + move;
                  this->check_reachable(queen, dest, true, true) == ReachableResult::MOVE;
                  dest += move) {
             }
@@ -107,7 +109,7 @@ public:
         const auto base_move_straight = Vector(1, 0);
         for (const Vector &move : base_move_straight.getAllPossibleTransforms())
         {
-            for (Vector &dest = pos;
+            for (Vector dest = pos + move;
                  this->check_reachable(queen, dest, true, true) == ReachableResult::MOVE;
                  dest += move) {
             }
@@ -121,7 +123,7 @@ public:
     };
     ReachableResult check_reachable(const Piece &piece, const BoardPos &dest, const bool can_walk, const bool can_capture) {
         if (!dest.isWithinGrid()) return ReachableResult::UNREACHABLE;
-        const auto & target = board.getPiece(dest);
+        const auto &target = board.getPiece(dest);
         if (!target) {
             if (!can_walk) return ReachableResult::UNREACHABLE;
             reachable_cells.push_back(dest);

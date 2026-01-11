@@ -4,6 +4,8 @@
 
 #include "chess-tui/vector.hpp"
 
+#include <set>
+
 Vector::Vector(const int8_t x, const int8_t y) : x(x), y(y) {
 
 }
@@ -53,30 +55,26 @@ Vector Vector::rotate90(const bool clockwise) const {
                   clockwise ? static_cast<int8_t>(-x) : x);
 }
 
-std::vector<Vector> Vector::getAllPossibleTransforms() const {
+/*
+ * Treat Vector as a shape and return all possible Vectors with the same shape.
+ */
+std::set<Vector> Vector::getAllPossibleTransforms() const {
     // Treat Vector as a shape and return all possible Vectors with the same
     // shape.
-
-    if (x == 0) {
-        return {*this, this->mirrorVertical()};
-    } else if (y == 0) {
-        return {*this, this->mirrorHorizontal()};
-    } else if (x == y) {
-        return {*this, this->mirrorHorizontal(), this->mirrorVertical(),
-                this->mirrorVertical().mirrorHorizontal()};
-    } else {
-        std::vector<Vector> result;
-        for (const Vector &mirrored :
-             {*this, this->mirrorHorizontal(), this->mirrorVertical(),
-              this->mirrorVertical().mirrorHorizontal()}) {
-            for (const Vector &rotated : {mirrored, mirrored.rotate90(true)}) {
-                result.push_back(rotated);
-            }
-              }
-        return result;
+    std::set<Vector> result;
+    for (const Vector &mirrored : {*this, this->mirrorHorizontal(), this->mirrorVertical(), this->mirrorVertical().mirrorHorizontal()}) {
+        result.emplace(mirrored);
+        result.emplace(mirrored.rotate90(true));
     }
+    return result;
 }
 
 bool Vector::isWithinGrid() const {
     return this->x >= 0 && this->x < 8 && this->y >= 0 && this->y < 8;
+}
+
+bool Vector::operator<(const Vector &other) const {
+    if (x != other.x)
+        return x < other.x;
+    return y < other.y;
 }
