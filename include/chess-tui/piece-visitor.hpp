@@ -27,7 +27,7 @@ public:
         const auto base_move = Vector(0, 1);
 
         this->check_reachable(pawn, pos + base_move * pawn.dir, true, false);
-        if (pos.x == pawn.start_rank)
+        if (pos.y == pawn.start_rank)
         {
             this->check_reachable(pawn, pos + base_move * pawn.dir * 2, true, false);
         }
@@ -35,9 +35,6 @@ public:
         const auto base_capture = Vector(1, 1);
         this->check_reachable(pawn, base_capture * pawn.dir, false, true);
         this->check_reachable(pawn, base_capture.mirrorHorizontal() * pawn.dir, false, true);
-        for (const BoardPos &reachable_cell : reachable_cells)
-            printf("%i, %i  ", reachable_cell.x, reachable_cell.y);
-        std::cout << std::endl;
     }
 
     void visit(Rook &rook) override
