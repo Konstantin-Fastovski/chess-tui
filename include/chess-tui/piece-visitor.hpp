@@ -19,6 +19,7 @@ public:
     {
         const auto & piece = board.getPiece(pos);
         if (!piece) return;
+        if (!this->has_moved) this->has_moved = true;
         piece->visit(*this);
     }
 
@@ -76,7 +77,9 @@ public:
 
         if (king.has_moved == false)
         {
-            // TODO add castling
+            if (board.getPiece(king.white ? BoardPos(0, 0) : BoardPos(0, 7))->has_moved == false) {
+                // TODO
+            }
         }
     }
     void visit(Bishop &bishop) override
@@ -134,5 +137,7 @@ private:
     Board &board;
     BoardPos pos;
 };
+
+class _visitor final : public PieceVisitor
 
 #endif // CHESS_TUI_PIECE_VISITOR_HPP

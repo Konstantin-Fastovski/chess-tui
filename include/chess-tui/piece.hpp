@@ -31,6 +31,7 @@ public:
 
 struct Piece {
   bool white;
+  bool has_moved;
 
   explicit Piece(const bool white) : white(white) {}
 
@@ -54,8 +55,6 @@ struct Pawn final : Piece {
 struct Rook final : Piece {
   explicit Rook(const bool white) : Piece(white) {}
 
-  bool has_moved = false; // TODO Update this on the first move
-
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
@@ -71,8 +70,6 @@ struct Knight final : Piece {
 
 struct King final : Piece {
   explicit King(const bool white) : Piece(white) {}
-
-  bool has_moved = false; // TODO Update this on the first king move
 
   std::string getUnicode() override;
 
