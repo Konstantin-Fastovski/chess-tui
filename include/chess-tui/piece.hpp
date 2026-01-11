@@ -34,7 +34,6 @@ struct Piece {
 
   explicit Piece(const bool white) : white(white) {}
 
-  virtual std::vector<BoardPos> getReachableCells(const BoardPos &position) = 0;
   virtual std::string getUnicode() = 0;
   virtual void visit(PieceVisitor &pieceVisitor) = 0;
 
@@ -47,9 +46,6 @@ struct Pawn final : Piece {
   const int8_t dir = white ? 1 : -1;
   const uint8_t start_rank = white ? 1 : 6;
 
-  std::vector<BoardPos> getReachableCells(const BoardPos &position) override;
-  [[nodiscard]] std::vector<BoardPos> getCapturableCells(const BoardPos &position) const;
-
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
@@ -60,8 +56,6 @@ struct Rook final : Piece {
 
   bool has_moved = false; // TODO Update this on the first move
 
-  std::vector<BoardPos> getReachableCells(const BoardPos &position) override;
-
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
@@ -69,8 +63,6 @@ struct Rook final : Piece {
 
 struct Knight final : Piece {
   explicit Knight(const bool white) : Piece(white) {}
-
-  std::vector<BoardPos> getReachableCells(const BoardPos &position) override;
 
   std::string getUnicode() override;
 
@@ -82,8 +74,6 @@ struct King final : Piece {
 
   bool has_moved = false; // TODO Update this on the first king move
 
-  std::vector<BoardPos> getReachableCells(const BoardPos &position) override;
-
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
@@ -92,8 +82,6 @@ struct King final : Piece {
 struct Bishop final : Piece {
   explicit Bishop(const bool white) : Piece(white) {}
 
-  std::vector<BoardPos> getReachableCells(const BoardPos &position) override;
-
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
@@ -101,8 +89,6 @@ struct Bishop final : Piece {
 
 struct Queen final : Piece {
   explicit Queen(const bool white) : Piece(white) {}
-
-  std::vector<BoardPos> getReachableCells(const BoardPos &position) override;
 
   std::string getUnicode() override;
 
