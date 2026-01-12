@@ -136,12 +136,12 @@ public:
         const auto &target = board.getPiece(dest);
         if (!target) {
             if (!can_walk) return ReachableResult::UNREACHABLE;
-            reachable_cells.push_back(dest);
+            reachable_cells.emplace(dest);
             return ReachableResult::MOVE;
         }
         if (piece.white == target->white || !can_capture)
             return ReachableResult::UNREACHABLE;
-        reachable_cells.push_back(dest);
+        reachable_cells.emplace(dest);
         return ReachableResult::CAPTURE;
     }
 
