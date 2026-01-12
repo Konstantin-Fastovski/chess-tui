@@ -13,7 +13,7 @@
 class reachable_cells_visitor final : public PieceVisitor
 {
 public:
-    std::vector<BoardPos> reachable_cells;
+    std::set<BoardPos> reachable_cells;
 
     explicit reachable_cells_visitor(Board &board, const BoardPos &pos) : board(board), pos(pos)
     {
@@ -68,8 +68,22 @@ public:
             for (int8_t y = -1; y < 1; ++y)
             {
                 BoardPos destination = pos + Vector(x, y);
+                bool would_move_into_checkmate;
                 if (x != 0 && y != 0) {
                     this->check_reachable(king, destination, true, true);
+                }
+            }
+        }
+
+        for (int8_t x = 0; x < 8; ++x) {
+            for (int8_t y = 0; y < 8; ++y) {
+                BoardPos testPos = {x, y};
+                const std::unique_ptr<Piece>& piece = board.getPiece(testPos);
+                if (!piece || piece->white == king.white) continue;
+                reachable_cells_visitor visitor{this->board, testPos};
+                piece->visit(visitor);
+                for (auto reachable_cell : visitor.reachable_cells) {
+                    this->reachable_cells.erase(reachable_cell);
                 }
             }
         }
@@ -79,6 +93,7 @@ public:
             // TODO add castling
         }
     }
+
     void visit(Bishop &bishop) override
     {
         const auto base_move = Vector(1, 1);
