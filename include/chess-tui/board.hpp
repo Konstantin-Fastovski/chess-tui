@@ -16,19 +16,22 @@ struct Move
 {
   BoardPos from;
   BoardPos to;
+  uint8_t castling; // 0 is no castling, 1 is short castling, 2 is long castling
 
-  Move(const BoardPos from, const BoardPos to);
+
+  Move(BoardPos from, BoardPos to);
+  explicit Move(uint8_t castling);
 };
 
 struct Board
 {
   std::array<std::shared_ptr<King>, 2> kings;
-  std::array<std::shared_ptr<Rook>, 4> rooks;
+  std::array<std::shared_ptr<Rook>, 4> initial_rooks;
   std::array<std::array<std::shared_ptr<Piece>, 8>, 8> grid;
 
   Board();
 
-  void applyMove(Move move);
+  void movePiece(const BoardPos &from, const BoardPos &to);
 
   void draw() const;
 
@@ -37,6 +40,7 @@ struct Board
   [[nodiscard]] BoardPos getPos(const Piece &piece) const;
 
   [[nodiscard]] King &getKing(bool white) const;
+  [[nodiscard]] Rook &getInitialRook(bool white, bool long_side) const;
 };
 
 class Player

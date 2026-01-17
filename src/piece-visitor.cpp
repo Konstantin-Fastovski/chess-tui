@@ -86,20 +86,6 @@ void reachable_cells_visitor::visit(King &king)
     if (king.white == this->current_player_white) {
         remove_enemy_reachable_cells(this->board, king.white, this->reachable_cells);
     }
-
-    if (king.has_moved) return;
-
-    int firsttrook = king.white ? 2 : 0;
-    int rank = king.white ? 0 : 7;
-    if (!board.rooks[leftrook].has_moved && !board.getPiece({1, rank}) && !board.getPiece({2, rank})) {
-        if (!is_reachable(board, {1, rank}, !king.white) && !is_reachable(board, {2, rank}, !king.white)) {
-            this->reachable_cells.emplace_back({{2, rank}});
-        }
-    } else if (!board.rooks[leftrook + 1].has_moved && !board.getPiece({4, rank}) && !board.getPiece({5, rank}))) {
-        if (!is_reachable(board, {4, rank}, !king.white) && !is_reachable(board, {5, rank}, !king.white)) {
-            this->reachable_cells.emplace_back({{5, rank}});
-        }
-    }
 }
 
 void reachable_cells_visitor::visit(Bishop &bishop)

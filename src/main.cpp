@@ -17,19 +17,13 @@ int main() {
         std::cout << "It's Player " << static_cast<uint8_t>(!current_player_white) + 1 << "'s turn! "
                 << std::endl;
         const auto move = players[current_player_white]->requestMove();
-        std::cout << "Requested Move: (" << std::to_string(move.from.x) << ", "
-                << std::to_string(move.from.y) << ")"
-                << " > (" << std::to_string(move.to.x) << ", "
-                << std::to_string(move.to.y) << ")" << std::endl;
-
-        const auto &piece = board.getPiece(move.from);
-        if (!piece) {
-            std::cout << "This square is empty" << std::endl;
-            continue;
-        }
-        if (piece->white != current_player_white) {
-            std::cout << "This is not your piece" << std::endl;
-            continue;
+        if (move.castling != 0) {
+            std::cout << "Requested Castling";
+        } else {
+            std::cout << "Requested Move: (" << std::to_string(move.from.x) << ", "
+                    << std::to_string(move.from.y) << ")"
+                    << " > (" << std::to_string(move.to.x) << ", "
+                    << std::to_string(move.to.y) << ")" << std::endl;
         }
 
         bool check = false;
@@ -37,19 +31,57 @@ int main() {
             check = true;
         }
 
-        auto visitor = reachable_cells_visitor(board, move.from, current_player_white);
+        if (move.castling) {
+            if (check) {
+                std::cout << "Cannot castle out of check";
+                continue;
+            }
 
-        if (std::ranges::find(visitor.reachable_cells, move.to) == visitor.reachable_cells.end()) {
-            std::cout << "This is not a valid move" << std::endl;
-            continue;
-        }
-        auto &capturePiece = board.getPiece(move.to);
-        if (capturePiece) {
-            std::cout << "You captured a " << capturePiece->getUnicode() << std::endl;
-        }
-        capturePiece.reset();
+            const King &king = board.getKing(current_player_white);
 
-        board.applyMove(move);
+            if (king.has_moved) {
+                std::cout << "Cannot castle: King already moved";
+                continue;
+            }
+
+            const bool is_long_castle = move.castling == 2;
+            const Rook &rook = board.getInitialRook(current_player_white, is_long_castle);
+
+            const int firstrook = king.white ? 2 : 0;
+            int8_t rank = king.white ? 0 : 7;
+            if (!board.initial_rooks[firstrook]->has_moved && !board.getPiece({1, rank}) && !board.getPiece({2, rank})) {
+                if (!is_reachable(board, {1, rank}, !king.white) && !is_reachable(board, {2, rank}, !king.white)) {
+                    this->reachable_cells.emplace(2, rank);
+                }
+            } else if (!board.initial_rooks[firstrook + 1]->has_moved && !board.getPiece({4, rank}) && !board.getPiece({5, rank}))) {
+                if (!is_reachable(board, {4, rank}, !king.white) && !is_reachable(board, {5, rank}, !king.white)) {
+                    this->reachable_cells.emplace(5, rank);
+                }
+            }
+        } else {
+            const auto &piece = board.getPiece(move.from);
+            if (!piece) {
+                std::cout << "This square is empty" << std::endl;
+                continue;
+            }
+            if (piece->white != current_player_white) {
+                std::cout << "This is not your piece" << std::endl;
+                continue;
+            }
+            auto visitor = reachable_cells_visitor(board, move.from, current_player_white);
+
+            if (std::ranges::find(visitor.reachable_cells, move.to) == visitor.reachable_cells.end()) {
+                std::cout << "This is not a valid move" << std::endl;
+                continue;
+            }
+            auto &capturePiece = board.getPiece(move.to);
+            if (capturePiece) {
+                std::cout << "You captured a " << capturePiece->getUnicode() << std::endl;
+            }
+            capturePiece.reset();
+
+            board.movePiece(move.from, move.to);
+        }
 
         current_player_white = !current_player_white;
     }

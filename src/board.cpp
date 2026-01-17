@@ -20,7 +20,11 @@ BoardPos parseBoardPos(const std::string &input)
 }
 
 Move::Move(const BoardPos from, const BoardPos to) : from(from),
-                                                     to(to) {}
+                                                     to(to),
+                                                      castling(0) {}
+
+Move::Move(const uint8_t castling) : from(0, 0), to(0, 0), castling(castling) {
+}
 
 Board::Board()
 {
@@ -29,14 +33,14 @@ Board::Board()
         this->grid[1][x] = std::make_shared<Pawn>(true);
         this->grid[6][x] = std::make_shared<Pawn>(false);
     }
-    this->rooks[0] = std::make_shared<Rook>(false);
-    this->rooks[1] = std::make_shared<Rook>(false);
-    this->rooks[2] = std::make_shared<Rook>(true);
-    this->rooks[3] = std::make_shared<Rook>(true);
-    this->grid[7][0] = this->rooks[0];
-    this->grid[7][7] = this->rooks[1];
-    this->grid[0][0] = this->rooks[2];
-    this->grid[0][7] = this->rooks[3];
+    this->initial_rooks[0] = std::make_shared<Rook>(false);
+    this->initial_rooks[1] = std::make_shared<Rook>(false);
+    this->initial_rooks[2] = std::make_shared<Rook>(true);
+    this->initial_rooks[3] = std::make_shared<Rook>(true);
+    this->grid[7][0] = this->initial_rooks[0];
+    this->grid[7][7] = this->initial_rooks[1];
+    this->grid[0][0] = this->initial_rooks[2];
+    this->grid[0][7] = this->initial_rooks[3];
     this->grid[0][1] = std::make_shared<Knight>(true);
     this->grid[0][6] = std::make_shared<Knight>(true);
     this->grid[7][1] = std::make_shared<Knight>(false);
@@ -53,11 +57,9 @@ Board::Board()
     this->grid[0][4] = this->kings[1];
 }
 
-// TODO: This method should return some kind of "MoveResult" which also states
-// if a player won and so on
-void Board::applyMove(const Move move)
+void Board::movePiece(const BoardPos &from, const BoardPos &to)
 {
-    grid[move.to.y][move.to.x] = std::move(grid[move.from.y][move.from.x]);
+    grid[to.y][to.x] = std::move(grid[from.y][from.x]);
 }
 
 void Board::draw() const
@@ -105,8 +107,18 @@ King & Board::getKing(const bool white) const {
     return *this->kings[static_cast<uint8_t>(white)];
 }
 
+Rook & Board::getInitialRook(const bool white, const bool long_side) const {
+    return *this->initial_rooks[white * 2 + long_side];
+}
+
 Move convertMove(const std::string &input)
 {
+    if (input == "O-O-O") {
+        return Move(2);
+    }
+    if (input == "O-O") {
+        return Move(1);
+    }
     if (input.size() > 4 || input.size() < 2)
     {
         throw std::invalid_argument("invalid move input");
