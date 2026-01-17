@@ -10,6 +10,9 @@ Vector::Vector(const int8_t x, const int8_t y) : x(x), y(y) {
 
 }
 
+Vector::Vector(): x(0), y(0) {
+}
+
 Vector Vector::operator*(const int8_t &factor) const {
     return {static_cast<int8_t>(x * factor), static_cast<int8_t>(y * factor)};
 }

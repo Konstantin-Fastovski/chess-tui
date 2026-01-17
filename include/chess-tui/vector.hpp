@@ -13,6 +13,7 @@ struct Vector {
   int8_t x, y;
 
   Vector(int8_t x, int8_t y);
+  Vector();
 
   Vector operator*(const int8_t &factor) const;
   Vector &operator*=(const int8_t &factor);

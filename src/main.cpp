@@ -12,11 +12,17 @@ int main() {
     Board board;
 
     while (true) {
-        board.draw();
+        board.draw({});
 
         std::cout << "It's Player " << static_cast<uint8_t>(!current_player_white) + 1 << "'s turn! "
                 << std::endl;
-        const auto move = players[current_player_white]->requestMove();
+        Move move;
+        try {
+            move = players[current_player_white]->requestMove();
+        } catch (std::invalid_argument &e) {
+            std::cout << "Invalid Move" << std::endl;
+            continue;
+        }
         if (move.castling != 0) {
             std::cout << "Requested Castling";
         } else {
@@ -27,7 +33,8 @@ int main() {
         }
 
         bool check = false;
-        if (is_reachable(board, board.getPos(board.getKing(current_player_white)), !current_player_white)) {
+        King &king = board.getKing(current_player_white);
+        if (is_reachable(board, board.getPos(king), !current_player_white)) {
             check = true;
         }
 
@@ -79,6 +86,10 @@ int main() {
                 std::cout << "You captured a " << capturePiece->getUnicode() << std::endl;
             }
             capturePiece.reset();
+            if (dynamic_cast<King*>(capturePiece.get())) {
+                std::cout << "Player " << static_cast<uint8_t>(current_player_white) + 1 << " Won!";
+                return EXIT_SUCCESS;
+            }
 
             board.movePiece(move.from, move.to);
         }

@@ -20,11 +20,12 @@ BoardPos parseBoardPos(const std::string &input)
 }
 
 Move::Move(const BoardPos from, const BoardPos to) : from(from),
-                                                     to(to),
-                                                      castling(0) {}
+                                                     to(to)  {}
 
-Move::Move(const uint8_t castling) : from(0, 0), to(0, 0), castling(castling) {
+Move::Move(const uint8_t castling) : castling(castling) {
 }
+
+Move::Move() = default;
 
 Board::Board()
 {
@@ -62,15 +63,18 @@ void Board::movePiece(const BoardPos &from, const BoardPos &to)
     grid[to.y][to.x] = std::move(grid[from.y][from.x]);
 }
 
-void Board::draw() const
+void Board::draw(const std::set<BoardPos> &marked_cells) const
 {
     std::cout << "┏━━━━━━━━━━━━━━━━━━━┓" << std::endl;
     std::cout << "┃  a b c d e f g h  ┃" << std::endl;
-    for (int y = 7; y >= 0; --y)
+    for (int8_t y = 7; y >= 0; --y)
     {
         std::cout << "┃" << std::to_string(y+1);
-        for (int x = 0; x < 8; ++x)
+        for (int8_t x = 0; x < 8; ++x)
         {
+            if (marked_cells.contains({x, y})) {
+                std::cout << " █";
+            }
             if (const auto &piece = this->grid[y][x])
             {
                 std::cout << " " << piece->getUnicode();

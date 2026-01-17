@@ -21,8 +21,8 @@ void remove_enemy_reachable_cells(Board &board, const bool white, std::set<Board
 
 bool is_reachable(Board &board, const BoardPos &pos, const bool white) {
     std::set cells{pos};
-    remove_enemy_reachable_cells(board, white, cells);
-    return !cells.empty();
+    remove_enemy_reachable_cells(board, !white, cells);
+    return cells.empty();
 }
 
 reachable_cells_visitor::reachable_cells_visitor(Board &board, const BoardPos &pos, const bool current_player_white)

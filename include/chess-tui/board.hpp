@@ -14,13 +14,13 @@ inline BoardPos parseBoardPos(const std::string &input);
 
 struct Move
 {
-  BoardPos from;
-  BoardPos to;
-  uint8_t castling; // 0 is no castling, 1 is short castling, 2 is long castling
-
+  BoardPos from = {};
+  BoardPos to = {};
+  uint8_t castling = 0; // 0 is no castling, 1 is short castling, 2 is long castling
 
   Move(BoardPos from, BoardPos to);
   explicit Move(uint8_t castling);
+  Move();
 };
 
 struct Board
@@ -33,7 +33,7 @@ struct Board
 
   void movePiece(const BoardPos &from, const BoardPos &to);
 
-  void draw() const;
+  void draw(const std::set<BoardPos> &marked_cells) const;
 
   std::shared_ptr<Piece> &getPiece(const BoardPos &pos);
 
