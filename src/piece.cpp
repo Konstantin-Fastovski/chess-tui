@@ -5,7 +5,7 @@
 #include "chess-tui/piece.hpp"
 
 std::string Pawn::getUnicode() {
-    return this->white ? "\u2659" : "\u265F";
+    return this->white ? "\u265F" : "\u2659";
 }
 
 void Pawn::visit(PieceVisitor &pieceVisitor) {
@@ -13,14 +13,14 @@ void Pawn::visit(PieceVisitor &pieceVisitor) {
 }
 
 std::string Rook::getUnicode() {
-    return this->white ? "\u2656" : "\u265C";
+    return this->white ? "\u265C" : "\u2656";
 }
 
 void Rook::visit(PieceVisitor &pieceVisitor) {
     pieceVisitor.visit(*this);
 }
 std::string Knight::getUnicode() {
-    return this->white ? "\u2658" : "\u265E";
+    return this->white ? "\u265E" : "\u2658";
 }
 
 void Knight::visit(PieceVisitor &pieceVisitor) {
@@ -28,7 +28,7 @@ void Knight::visit(PieceVisitor &pieceVisitor) {
 }
 
 std::string King::getUnicode() {
-    return this->white ? "\u2654" : "\u265A";
+    return this->white ? "\u265A" : "\u2654";
 }
 
 void King::visit(PieceVisitor &pieceVisitor) {
@@ -36,7 +36,7 @@ void King::visit(PieceVisitor &pieceVisitor) {
 }
 
 std::string Bishop::getUnicode() {
-    return this->white ? "\u2657" : "\u265D";
+    return this->white ? "\u265D" : "\u2657";
 }
 
 void Bishop::visit(PieceVisitor &pieceVisitor) {
@@ -44,7 +44,7 @@ void Bishop::visit(PieceVisitor &pieceVisitor) {
 }
 
 std::string Queen::getUnicode() {
-    return this->white ? "\u2655" : "\u265B";
+    return this->white ? "\u265B" : "\u2655";
 }
 
 void Queen::visit(PieceVisitor &pieceVisitor) {

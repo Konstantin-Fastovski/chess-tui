@@ -22,17 +22,21 @@ struct Move
 
 struct Board
 {
-  std::array<std::array<std::unique_ptr<Piece>, 8>, 8> grid;
+  std::array<std::shared_ptr<King>, 2> kings;
+  std::array<std::shared_ptr<Rook>, 4> rooks;
+  std::array<std::array<std::shared_ptr<Piece>, 8>, 8> grid;
 
   Board();
 
-  void applyMove(const Move move);
+  void applyMove(Move move);
 
   void draw() const;
 
-  std::unique_ptr<Piece> &getPiece(const BoardPos &pos);
+  std::shared_ptr<Piece> &getPiece(const BoardPos &pos);
 
-  BoardPos getPos(Piece &piece);
+  [[nodiscard]] BoardPos getPos(const Piece &piece) const;
+
+  [[nodiscard]] King &getKing(bool white) const;
 };
 
 class Player
