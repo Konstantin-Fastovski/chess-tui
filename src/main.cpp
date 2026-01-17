@@ -18,7 +18,7 @@ int main() {
                 << std::endl;
         const auto move = players[current_player_white]->requestMove();
         if (move.castling != 0) {
-            std::cout << "Requested Castling";
+            std::cout << "Requested Castling" << std::endl;
         } else {
             std::cout << "Requested Move: (" << std::to_string(move.from.x) << ", "
                     << std::to_string(move.from.y) << ")"
@@ -33,30 +33,49 @@ int main() {
 
         if (move.castling) {
             if (check) {
-                std::cout << "Cannot castle out of check";
+                std::cout << "Cannot castle out of check" << std::endl;
                 continue;
             }
 
             const King &king = board.getKing(current_player_white);
 
             if (king.has_moved) {
-                std::cout << "Cannot castle: King already moved";
+                std::cout << "Cannot castle: King already moved" << std::endl;
                 continue;
             }
 
-            const bool is_long_castle = move.castling == 2;
-            const Rook &rook = board.getInitialRook(current_player_white, is_long_castle);
+            const bool is_short_castle = move.castling == 2;
+            const Rook &rook = board.getInitialRook(current_player_white, is_short_castle);
 
-            const int firstrook = king.white ? 2 : 0;
+            if (rook.has_moved) {
+                std::cout << "Cannot castle: Rook already moved" << std::endl;
+                continue;
+            }
+
             int8_t rank = king.white ? 0 : 7;
-            if (!board.initial_rooks[firstrook]->has_moved && !board.getPiece({1, rank}) && !board.getPiece({2, rank})) {
-                if (!is_reachable(board, {1, rank}, !king.white) && !is_reachable(board, {2, rank}, !king.white)) {
-                    this->reachable_cells.emplace(2, rank);
+
+            if (is_short_castle) {
+                if (board.getPiece({5, rank}) || board.getPiece({6, rank})) {
+                    std::cout << "Cannot castle: Pieces in the way" << std::endl;
+                    continue;
                 }
-            } else if (!board.initial_rooks[firstrook + 1]->has_moved && !board.getPiece({4, rank}) && !board.getPiece({5, rank}))) {
-                if (!is_reachable(board, {4, rank}, !king.white) && !is_reachable(board, {5, rank}, !king.white)) {
-                    this->reachable_cells.emplace(5, rank);
+                if (is_reachable(board, {5, rank}, !king.white) || is_reachable(board, {6, rank}, !king.white)) {
+                    std::cout << "Cannot castle through/into check" << std::endl;
+                    continue;
                 }
+                board.movePiece({4, rank}, {6, rank});
+                board.movePiece({7, rank}, {5, rank});
+            } else {
+                if (board.getPiece({2, rank}) || board.getPiece({3, rank})) {
+                    std::cout << "Cannot castle: Pieces in the way" << std::endl;
+                    continue;
+                }
+                if (is_reachable(board, {2, rank}, !king.white) || is_reachable(board, {3, rank}, !king.white)) {
+                    std::cout << "Cannot castle through/into check" << std::endl;
+                    continue;
+                }
+                board.movePiece({4, rank}, {2, rank});
+                board.movePiece({0, rank}, {3, rank});
             }
         } else {
             const auto &piece = board.getPiece(move.from);
