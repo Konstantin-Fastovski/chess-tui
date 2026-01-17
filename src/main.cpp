@@ -59,7 +59,7 @@ int main() {
                 continue;
             }
 
-            const bool is_short_castle = move.castling == 2;
+            const bool is_short_castle = move.castling == 1;
             const Rook &rook = board.getInitialRook(current_player_white, is_short_castle);
 
             if (rook.has_moved) {
