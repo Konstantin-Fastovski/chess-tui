@@ -4,25 +4,29 @@
 
 #include "chess-tui/piece-visitor.hpp"
 
-bool is_reachable(Board &board, const BoardPos &pos, const bool white) {
+void remove_enemy_reachable_cells(Board &board, const bool white, std::set<BoardPos> &cells) {
     for (int8_t x = 0; x < 8; ++x) {
         for (int8_t y = 0; y < 8; ++y) {
             BoardPos testPos = {x, y};
-            const std::shared_ptr<Piece>& piece = board.getPiece(testPos);
-            if (!piece || piece->white != white) continue;
-            reachable_cells_visitor visitor{board, testPos};
-            piece->visit(visitor);
-            for (auto reachable_cell : visitor.reachable_cells) {
-                if (reachable_cell == pos) {
-                    return true;
-                }
+            const std::shared_ptr<Piece>& enemy_piece = board.getPiece(testPos);
+            if (!enemy_piece || enemy_piece->white == white) continue;
+            reachable_cells_visitor enemy_visitor{board, testPos, white};
+            enemy_piece->visit(enemy_visitor);
+            for (auto reachable_cell : enemy_visitor.reachable_cells) {
+                cells.erase(reachable_cell);
             }
         }
     }
-    return false;
 }
 
-reachable_cells_visitor::reachable_cells_visitor(Board &board, const BoardPos &pos) : board(board), pos(pos)
+bool is_reachable(Board &board, const BoardPos &pos, const bool white) {
+    std::set cells{pos};
+    remove_enemy_reachable_cells(board, white, cells);
+    return !cells.empty();
+}
+
+reachable_cells_visitor::reachable_cells_visitor(Board &board, const BoardPos &pos, const bool current_player_white)
+    : board(board), pos(pos), current_player_white(current_player_white)
 {
     const auto & piece = board.getPiece(pos);
     if (!piece) return;
@@ -79,17 +83,8 @@ void reachable_cells_visitor::visit(King &king)
         }
     }
 
-    for (int8_t x = 0; x < 8; ++x) {
-        for (int8_t y = 0; y < 8; ++y) {
-            BoardPos testPos = {x, y};
-            const std::shared_ptr<Piece>& piece = board.getPiece(testPos);
-            if (!piece || piece->white == king.white) continue;
-            reachable_cells_visitor visitor{this->board, testPos};
-            piece->visit(visitor);
-            for (auto reachable_cell : visitor.reachable_cells) {
-                this->reachable_cells.erase(reachable_cell);
-            }
-        }
+    if (king.white == this->current_player_white) {
+        remove_enemy_reachable_cells(this->board, king.white, this->reachable_cells);
     }
 
     if (king.has_moved) return;

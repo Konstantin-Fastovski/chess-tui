@@ -11,13 +11,14 @@
 class reachable_cells_visitor;
 
 bool is_reachable(Board &board, const BoardPos &pos, bool white);
+void remove_enemy_reachable_cells(Board &board, bool white, std::set<BoardPos> &cells);
 
 class reachable_cells_visitor final : public PieceVisitor
 {
 public:
     std::set<BoardPos> reachable_cells;
 
-    explicit reachable_cells_visitor(Board &board, const BoardPos &pos);
+    explicit reachable_cells_visitor(Board &board, const BoardPos &pos, bool current_player_white);
 
     void visit(Pawn &pawn) override;
 
@@ -41,6 +42,7 @@ public:
 private:
     Board &board;
     BoardPos pos;
+    bool current_player_white;
 };
 
 #endif // CHESS_TUI_PIECE_VISITOR_HPP
