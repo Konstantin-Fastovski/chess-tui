@@ -51,10 +51,10 @@ Board::Board()
     this->grid[7][2] = std::make_shared<Bishop>(false);
     this->grid[7][5] = std::make_shared<Bishop>(false);
     this->grid[0][3] = std::make_shared<Queen>(true);
-    this->grid[7][4] = std::make_shared<Queen>(false);
+    this->grid[7][3] = std::make_shared<Queen>(false);
     this->kings[0] = std::make_shared<King>(false);
     this->kings[1] = std::make_shared<King>(true);
-    this->grid[7][3] = this->kings[0];
+    this->grid[7][4] = this->kings[0];
     this->grid[0][4] = this->kings[1];
 }
 
@@ -111,8 +111,8 @@ King & Board::getKing(const bool white) const {
     return *this->kings[static_cast<uint8_t>(white)];
 }
 
-Rook & Board::getInitialRook(const bool white, const bool long_side) const {
-    return *this->initial_rooks[white * 2 + long_side];
+Rook & Board::getInitialRook(const bool white, const bool short_side) const {
+    return *this->initial_rooks[white * 2 + short_side];
 }
 
 Move convertMove(const std::string &input)
