@@ -16,6 +16,22 @@ int main() {
 
         std::cout << "It's Player " << static_cast<uint8_t>(!current_player_white) + 1 << "'s turn! "
                 << std::endl;
+
+        bool check = false;
+        King &king = board.getKing(current_player_white);
+        BoardPos kingPos = board.getPos(king);
+        if (is_reachable(board, kingPos, !current_player_white)) {
+            std::cout << "Is in Check!" << std::endl;
+            check = true;
+
+            auto visitor = reachable_cells_visitor(board, kingPos, current_player_white);
+            visitor.visit(king);
+            if (visitor.reachable_cells.empty()) {
+                std::cout << "Player " << static_cast<uint8_t>(current_player_white) + 1 << " Won!" << std::endl;
+                return EXIT_SUCCESS;
+            }
+        }
+
         Move move;
         try {
             move = players[current_player_white]->requestMove();
@@ -32,19 +48,11 @@ int main() {
                     << std::to_string(move.to.y) << ")" << std::endl;
         }
 
-        bool check = false;
-        King &king = board.getKing(current_player_white);
-        if (is_reachable(board, board.getPos(king), !current_player_white)) {
-            check = true;
-        }
-
         if (move.castling) {
             if (check) {
                 std::cout << "Cannot castle out of check" << std::endl;
                 continue;
             }
-
-            const King &king = board.getKing(current_player_white);
 
             if (king.has_moved) {
                 std::cout << "Cannot castle: King already moved" << std::endl;
@@ -105,10 +113,6 @@ int main() {
                 std::cout << "You captured a " << capturePiece->getUnicode() << std::endl;
             }
             capturePiece.reset();
-            if (dynamic_cast<King*>(capturePiece.get())) {
-                std::cout << "Player " << static_cast<uint8_t>(current_player_white) + 1 << " Won!";
-                return EXIT_SUCCESS;
-            }
 
             board.movePiece(move.from, move.to);
         }

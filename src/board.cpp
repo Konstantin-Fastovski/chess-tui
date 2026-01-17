@@ -74,8 +74,7 @@ void Board::draw(const std::set<BoardPos> &marked_cells) const
         {
             if (marked_cells.contains({x, y})) {
                 std::cout << " █";
-            }
-            if (const auto &piece = this->grid[y][x])
+            } else if (const auto &piece = this->grid[y][x])
             {
                 std::cout << " " << piece->getUnicode();
             }
