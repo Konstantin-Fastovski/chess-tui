@@ -11,7 +11,6 @@ void remove_enemy_reachable_cells(Board &board, const bool white, std::set<Board
             const std::shared_ptr<Piece>& enemy_piece = board.getPiece(testPos);
             if (!enemy_piece || enemy_piece->white == white) continue;
             reachable_cells_visitor enemy_visitor{board, testPos, white};
-            enemy_piece->visit(enemy_visitor);
             for (auto reachable_cell : enemy_visitor.reachable_cells) {
                 cells.erase(reachable_cell);
             }
@@ -72,19 +71,15 @@ void reachable_cells_visitor::visit(Knight &knight)
 
 void reachable_cells_visitor::visit(King &king)
 {
-    for (int8_t x = -1; x < 1; ++x)
+    for (int8_t x = -1; x <= 1; ++x)
     {
-        for (int8_t y = -1; y < 1; ++y)
+        for (int8_t y = -1; y <= 1; ++y)
         {
             BoardPos destination = pos + Vector(x, y);
-            if (x != 0 && y != 0) {
+            if (x != 0 || y != 0) {
                 this->check_reachable(king, destination, true, true);
             }
         }
-    }
-
-    if (king.white == this->current_player_white) {
-        remove_enemy_reachable_cells(this->board, king.white, this->reachable_cells);
     }
 }
 

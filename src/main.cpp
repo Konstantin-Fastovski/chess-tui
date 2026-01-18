@@ -132,14 +132,7 @@ int main() {
         BoardPos kingPos = board.getPos(king);
         if (is_reachable(board, kingPos, !current_player_white)) {
             check = true;
-
-            auto visitor = reachable_cells_visitor(board, kingPos, current_player_white);
-            visitor.visit(king);
-            if (visitor.reachable_cells.empty()) {
-                std::cout << "Player " << static_cast<uint8_t>(!current_player_white) + 1 << " Won!" << std::endl;
-                return EXIT_SUCCESS;
-            }
-            std::cout << "Check! You can only move your King.";
+            std::cout << "Check! You can only move your King." << std::endl;
         }
 
         while (true) {
@@ -223,6 +216,10 @@ int main() {
                 std::cout << "This is not your piece" << std::endl;
                 continue;
             }
+            if (check && piece.get() != &board.getKing(current_player_white)) {
+                std::cout << "You can only move your King" << std::endl;
+                continue;
+            }
             auto visitor = reachable_cells_visitor(board, move.from, current_player_white);
 
             if (std::ranges::find(visitor.reachable_cells, move.to) == visitor.reachable_cells.end()) {
@@ -232,6 +229,10 @@ int main() {
             auto &capturePiece = board.getPiece(move.to);
             if (capturePiece) {
                 std::cout << "You captured a " << capturePiece->getUnicode() << std::endl;
+            }
+            if (capturePiece.get() == &board.getKing(!current_player_white)) {
+                std::cout << "Player " << static_cast<uint8_t>(!current_player_white) + 1 << " Won!" << std::endl;
+                return EXIT_SUCCESS;
             }
             capturePiece.reset();
 
