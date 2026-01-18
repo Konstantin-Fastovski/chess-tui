@@ -1,11 +1,9 @@
 #pragma once
 #include <array>
-#include <ranges>
 #include <cstdint>
 #include <iostream>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "chess-tui/vector.hpp"
 #include "chess-tui/piece.hpp"
@@ -41,26 +39,4 @@ struct Board
 
   [[nodiscard]] King &getKing(bool white) const;
   [[nodiscard]] Rook &getInitialRook(bool white, bool long_side) const;
-};
-
-class Player
-{
-public:
-  virtual Move requestMove() = 0;
-
-  virtual ~Player() = default;
-};
-
-/**
- * Currently only supports format (a2b3)
- */
-const char pieces[] = {'B', 'K', 'N', 'Q', 'R'};
-
-Move convertMove(const std::string &input);
-
-
-class LocalPlayer final : public Player
-{
-public:
-  Move requestMove() override;
 };

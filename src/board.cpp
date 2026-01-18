@@ -148,11 +148,3 @@ Move convertMove(const std::string &input)
     }
     throw std::invalid_argument("invalid move input");
 }
-
-Move LocalPlayer::requestMove()
-{
-    std::cout << "Please input move (Format a2b4): ";
-    std::string input;
-    std::cin >> input;
-    return convertMove(input);
-}

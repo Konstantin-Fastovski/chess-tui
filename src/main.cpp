@@ -2,14 +2,15 @@
 #include "chess-tui/piece.hpp"
 #include "chess-tui/vector.hpp"
 #include "chess-tui/piece-visitor.hpp"
+#include "chess-tui/player.hpp"
 
 int main() {
+    Board board;
+
     const std::array<std::unique_ptr<Player>, 2> players = {
-        std::make_unique<LocalPlayer>(), std::make_unique<LocalPlayer>()
+        std::make_unique<LocalPlayer>(), std::make_unique<BasicBotPlayer>(board, true)
     };
     bool current_player_white = true;
-
-    Board board;
 
     while (true) {
         board.draw({});

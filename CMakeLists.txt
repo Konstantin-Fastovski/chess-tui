@@ -13,5 +13,7 @@ add_executable(chess_tui
         include/chess-tui/piece-visitor.hpp
         src/board.cpp
         src/piece-visitor.cpp
+        include/chess-tui/player.hpp
+        src/player.cpp
 )
 target_include_directories(chess_tui PUBLIC include)
