@@ -5,7 +5,6 @@
 #ifndef CHESS_TUI_PIECE_HPP
 #define CHESS_TUI_PIECE_HPP
 #include <string>
-#include <vector>
 
 #include "chess-tui/vector.hpp"
 
@@ -31,9 +30,12 @@ public:
 
 struct Piece {
   bool white;
+  bool has_moved = false;
 
   explicit Piece(const bool white) : white(white) {}
+  explicit Piece(const bool white, const bool has_moved) : white(white), has_moved(has_moved) {}
 
+  virtual char getSymbol() = 0;
   virtual std::string getUnicode() = 0;
   virtual void visit(PieceVisitor &pieceVisitor) = 0;
 
@@ -42,6 +44,7 @@ struct Piece {
 
 struct Pawn final : Piece {
   explicit Pawn(const bool white) : Piece(white) {}
+  Pawn(const bool white, const bool has_moved) : Piece(white, has_moved) {}
 
   const int8_t dir = white ? 1 : -1;
   const uint8_t start_rank = white ? 1 : 6;
@@ -49,50 +52,63 @@ struct Pawn final : Piece {
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
+
+  char getSymbol() override;
 };
 
 struct Rook final : Piece {
   explicit Rook(const bool white) : Piece(white) {}
-
-  bool has_moved = false; // TODO Update this on the first move
+  Rook(const bool white, const bool has_moved) : Piece(white, has_moved) {}
 
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
+
+  char getSymbol() override;
 };
 
 struct Knight final : Piece {
   explicit Knight(const bool white) : Piece(white) {}
+  Knight(const bool white, const bool has_moved) : Piece(white, has_moved) {}
 
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
+
+  char getSymbol() override;
 };
 
 struct King final : Piece {
   explicit King(const bool white) : Piece(white) {}
-
-  bool has_moved = false; // TODO Update this on the first king move
+  King(const bool white, const bool has_moved) : Piece(white, has_moved) {}
 
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
+
+  char getSymbol() override;
 };
 
 struct Bishop final : Piece {
   explicit Bishop(const bool white) : Piece(white) {}
+  Bishop(const bool white, const bool has_moved) : Piece(white, has_moved) {}
 
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
+
+  char getSymbol() override;
 };
 
 struct Queen final : Piece {
   explicit Queen(const bool white) : Piece(white) {}
+  Queen(const bool white, const bool has_moved) : Piece(white, has_moved) {}
 
   std::string getUnicode() override;
 
   void visit(PieceVisitor &pieceVisitor) override;
+
+  char getSymbol() override;
 };
 
 #endif //CHESS_TUI_PIECE_HPP

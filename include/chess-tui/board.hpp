@@ -14,10 +14,13 @@ struct Move
 {
   BoardPos from = {};
   BoardPos to = {};
-  uint8_t castling = 0; // 0 is no castling, 1 is short castling, 2 is long castling
+  int castling = 0; // 0 is no castling, 1 is short castling, 2 is long castling
+  bool store_game = false;
+  bool load_game = false;
 
   Move(BoardPos from, BoardPos to);
-  explicit Move(uint8_t castling);
+  explicit Move(int castling);
+  explicit Move(bool load_game);
   Move();
 };
 
@@ -28,12 +31,15 @@ struct Board
   std::array<std::array<std::shared_ptr<Piece>, 8>, 8> grid;
 
   Board();
+  explicit Board(const std::vector<std::shared_ptr<Piece>> &pieces);
 
   void movePiece(const BoardPos &from, const BoardPos &to);
 
   void draw(const std::set<BoardPos> &marked_cells) const;
 
   std::shared_ptr<Piece> &getPiece(const BoardPos &pos);
+
+  void setPiece(const BoardPos &pos, std::shared_ptr<Piece> &&piece);
 
   [[nodiscard]] BoardPos getPos(const Piece &piece) const;
 

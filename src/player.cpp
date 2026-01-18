@@ -5,8 +5,11 @@
 #include "chess-tui/player.hpp"
 
 #include <unordered_map>
+#include <bits/this_thread_sleep.h>
 
 #include "chess-tui/piece-visitor.hpp"
+
+using namespace std::chrono_literals;
 
 
 Move LocalPlayer::requestMove()
@@ -21,6 +24,9 @@ BasicBotPlayer::BasicBotPlayer(Board &board, const bool white) : board(board), w
 }
 
 Move BasicBotPlayer::requestMove() {
+    std::this_thread::sleep_for(500ms);
+    std::cout << "Thinking..." << std::endl;
+    std::this_thread::sleep_for(1000ms);
     std::unordered_map<std::shared_ptr<Piece>, std::set<BoardPos>> pieces;
     for (int8_t y = 0; y < 8; ++y) {
         for (int8_t x = 0; x < 8; ++x) {

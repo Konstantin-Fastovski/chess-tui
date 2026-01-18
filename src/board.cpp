@@ -22,7 +22,15 @@ BoardPos parseBoardPos(const std::string &input)
 Move::Move(const BoardPos from, const BoardPos to) : from(from),
                                                      to(to)  {}
 
-Move::Move(const uint8_t castling) : castling(castling) {
+Move::Move(const int castling) : castling(castling) {
+}
+
+Move::Move(const bool load_game) {
+    if (load_game) {
+        this->load_game = true;
+    }  else {
+        this->store_game = true;
+    }
 }
 
 Move::Move() = default;
@@ -93,6 +101,10 @@ std::shared_ptr<Piece> &Board::getPiece(const BoardPos &pos) {
     return this->grid[pos.y][pos.x];
 }
 
+void Board::setPiece(const BoardPos &pos, std::shared_ptr<Piece> &&piece) {
+    this->grid[pos.y][pos.x] = piece;
+}
+
 BoardPos Board::getPos(const Piece &piece) const {
     for (int8_t y = 0; y < 8; y++)
     {
@@ -121,6 +133,12 @@ Move convertMove(const std::string &input)
     }
     if (input == "O-O") {
         return Move(1);
+    }
+    if (input == "s") {
+        return Move(false);
+    }
+    if (input == "l") {
+        return Move(true);
     }
     if (input.size() > 4 || input.size() < 2)
     {
