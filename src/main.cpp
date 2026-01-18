@@ -132,7 +132,7 @@ int main() {
         BoardPos kingPos = board.getPos(king);
         if (is_reachable(board, kingPos, !current_player_white)) {
             check = true;
-            std::cout << "Check! You can only move your King." << std::endl;
+            std::cout << "Check!" << std::endl;
         }
 
         while (true) {
@@ -214,10 +214,6 @@ int main() {
             }
             if (piece->white != current_player_white) {
                 std::cout << "This is not your piece" << std::endl;
-                continue;
-            }
-            if (check && piece.get() != &board.getKing(current_player_white)) {
-                std::cout << "You can only move your King" << std::endl;
                 continue;
             }
             auto visitor = reachable_cells_visitor(board, move.from, current_player_white);
