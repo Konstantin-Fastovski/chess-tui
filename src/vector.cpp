@@ -62,8 +62,6 @@ Vector Vector::rotate90(const bool clockwise) const {
  * Treat Vector as a shape and return all possible Vectors with the same shape.
  */
 std::set<Vector> Vector::getAllPossibleTransforms() const {
-    // Treat Vector as a shape and return all possible Vectors with the same
-    // shape.
     std::set<Vector> result;
     for (const Vector &mirrored : {*this, this->mirrorHorizontal(), this->mirrorVertical(), this->mirrorVertical().mirrorHorizontal()}) {
         result.emplace(mirrored);

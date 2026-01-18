@@ -19,8 +19,6 @@ public:
 /**
  * Currently only supports format (a2b3)
  */
-const char piece_symbols[] = {'B', 'K', 'N', 'Q', 'R'};
-
 Move convertMove(const std::string &input);
 
 
