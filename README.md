@@ -2,6 +2,15 @@
 
 Ein im Terminal spielbares Schachspiel gegen einen Gegner im Hot-Seat oder gegen einen simplen Computer-Gegner.
 
+## Projekt bauen
+```
+mkdir build
+cd build
+cmake ..
+make
+./chess_tui
+```
+
 ## Zugformat
 
 Normale Züge: a2a3, f1c4, etc.
